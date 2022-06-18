@@ -20,6 +20,5 @@ async def bot_start(message: types.Message):
 
             ]
         )
-        photo = InputFile(f"admin_panel/media/{product.image}")
-        await bot.send_photo(photo=photo, chat_id=message.chat.id,caption=text)
+        await bot.send_photo(photo=product.image, chat_id=message.chat.id,caption=text)
 
