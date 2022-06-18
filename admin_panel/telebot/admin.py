@@ -42,6 +42,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
 
     list_display_links = ('pk', 'title')
     empty_value_display = '-пусто-'
+    list_editable = ('category',)
     list_filter = ('category',)
     search_fields = ('title',)
 
@@ -98,11 +99,33 @@ class OrdersAdmin(admin.ModelAdmin):
         'product',
         'customer',
         'quantity',
-        'status'
+        'get_address',
+        'status',
+        'get_status_emoji',
     )
 
-    list_display_links = ('pk', 'product', 'customer')
+    list_display_links = ('pk', 'product',)
+    list_editable = ('status',)
+    list_filter = ('status',)
+
     empty_value_display = '-пусто-'
+
+    def get_address(self, object):
+        return object.customer.address
+
+    def get_status_emoji(self, object):
+        if object.status == "accepted":
+            return mark_safe(f"&#128308;")
+        elif object.status == "processed":
+            return mark_safe(f"&#128992;")
+        elif object.status == "in_delivery":
+            return mark_safe(f"&#128993;")
+        elif object.status == "delivered":
+            return mark_safe(f"&#128994;")
+
+    get_status_emoji.short_description = ""
+
+    get_address.short_description = "Адрес отправки"
 
     class Meta:
         verbose_name_plural = 'Заказы'

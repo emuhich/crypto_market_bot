@@ -204,4 +204,4 @@ class Orders(CreatedModel):
         ordering = ('-created',)
 
     def __str__(self):
-        return self.product
+        return self.product.name

@@ -21,7 +21,7 @@ services:
     build:
       context: .
     command: >
-      sh -c "django_app.py makemigrations &&
+      sh -c "
       python django_app.py migrate &&
       python django_app.py runserver 0.0.0.0:8000 --noreload"
     ports:
