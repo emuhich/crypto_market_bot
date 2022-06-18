@@ -1,0 +1,62 @@
+version: "3.1"
+
+services:
+  db:
+    container_name: database
+    image: postgres:14
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - botnet
+    volumes:
+      - ./postgres:/var/lib/postgresql
+
+  django:
+    container_name: admin_panel
+    build:
+      context: .
+    command: >
+      sh -c "python django_app.py migrate &&
+      python django_app.py runserver 0.0.0.0:8000 --noreload"
+    ports:
+      - 8000:8000
+    networks:
+      - botnet
+    restart: always
+    env_file:
+      - ".env"
+    depends_on:
+      - db
+
+  redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - botnet
+
+
+  tgbot:
+    container_name: bot
+    build:
+      context: .
+    command: python app.py
+    restart: always
+    networks:
+      - botnet
+    env_file:
+      - ".env"
+    depends_on:
+      - db
+      - django
+      - redis
+    volumes:
+      - .:/src
+
+networks:
+   botnet:
+      driver: bridge

@@ -1,1 +1,1 @@
-# crypto_market_bot
+# bot_structure
