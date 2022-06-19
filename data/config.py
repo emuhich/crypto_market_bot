@@ -15,6 +15,7 @@ REDIS_DB_FSM = int(os.getenv("REDIS_DB_FSM", default=0))
 REDIS_DB_JOBSTORE = int(os.getenv("REDIS_DB_JOBSTORE", default=1))
 REDIS_DB_JOIN_LIST = int(os.getenv("REDIS_DB_JOIN_LIST", default=2))
 
+SUPPORT_LINK = str(os.getenv("SUPPORT_LINK"))  # на чат с поддержкой
 
 admins = [
     417804053

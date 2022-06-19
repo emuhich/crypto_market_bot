@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.utils.safestring import mark_safe
 
-from .models import Product, SubCategory, Category, Client, Orders
+from .models import Product, SubCategory, Category, Client, Orders, Questions, TokenBinance
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -131,10 +131,49 @@ class OrdersAdmin(admin.ModelAdmin):
         verbose_name_plural = 'Заказы'
 
 
+class QuestionsAdmin(admin.ModelAdmin):
+    list_display = (
+        'questions',
+        'answer',
+    )
+
+    list_display_links = ('questions',)
+    empty_value_display = '-пусто-'
+    search_fields = ('questions',)
+
+    class Meta:
+        verbose_name_plural = 'Часто задаваемые вопросы'
+
+
+class TokenBinanceAdmin(admin.ModelAdmin):
+    list_display = (
+        'token',
+        'secret_key',
+    )
+
+    list_display_links = ('token',)
+    empty_value_display = '-пусто-'
+    search_fields = ('token',)
+
+    class Meta:
+        verbose_name_plural = 'Ключи для доступа к оплате'
+
+
+class ServiceAdmin(admin.ModelAdmin):
+    change_form_template = "base.html"
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['users_count'] = Client.objects.all().count()
+        return super(ServiceAdmin, self).add_view(request, form_url, extra_context)
+
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(SubCategory, SubCategoryAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(Orders, OrdersAdmin)
+admin.site.register(Questions, QuestionsAdmin)
+admin.site.register(TokenBinance, TokenBinanceAdmin)
 admin.site.site_title = 'Админ панель телеграмм бота'
 admin.site.site_header = 'Админ панель телеграмм бота'

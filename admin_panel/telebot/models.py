@@ -205,3 +205,43 @@ class Orders(CreatedModel):
 
     def __str__(self):
         return self.product.name
+
+
+class Questions(CreatedModel):
+    questions = models.CharField(
+        max_length=50,
+        help_text='Часто задоваемый вопрос',
+        verbose_name='Вопрос',
+    )
+    answer = models.TextField(
+        help_text='Ответ на ваш вопрос',
+        verbose_name='Ответ',
+    )
+
+    class Meta:
+        verbose_name = 'Часто задаваемые вопросы'
+        verbose_name_plural = 'Часто задаваемые вопросы'
+        ordering = ('-created',)
+
+    def __str__(self):
+        return self.questions
+
+
+class TokenBinance(models.Model):
+    token = models.CharField(
+        max_length=100,
+        help_text='Токен для binance',
+        verbose_name='Токен',
+    )
+    secret_key = models.CharField(
+        max_length=100,
+        help_text='Секретный ключ для binance',
+        verbose_name='Секретный ключ',
+    )
+
+    class Meta:
+        verbose_name = 'Ключи для доступа к оплате'
+        verbose_name_plural = 'Ключи для доступа к оплате'
+
+    def __str__(self):
+        return self.token
