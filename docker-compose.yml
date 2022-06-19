@@ -21,7 +21,8 @@ services:
     build:
       context: .
     command: >
-      sh -c "
+      sh -c "python django_app.py collectstatic &&
+      python django_app.py migrate &&
       python django_app.py runserver 0.0.0.0:8000 --noreload"
     ports:
       - 8000:8000
