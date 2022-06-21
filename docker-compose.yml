@@ -21,7 +21,7 @@ services:
     build:
       context: .
     command: >
-      sh -c "python django_app.py collectstatic &&
+      sh -c "
       python django_app.py migrate &&
       python django_app.py runserver 0.0.0.0:8000 --noreload"
     ports:
@@ -33,6 +33,8 @@ services:
       - ".env"
     depends_on:
       - db
+    volumes:
+      - .:/src
 
   redis:
     image: redis:alpine

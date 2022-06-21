@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 
 from django.utils.safestring import mark_safe
 
@@ -19,7 +20,7 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('created', 'sub_category',)
     empty_value_display = '-пусто-'
-    fields = ('name', 'description', 'sub_category', 'image', 'get_html_image', 'price', 'quantity')
+    fields = ('name', 'description', 'sub_category', 'image', 'get_html_image', 'price', 'cost_price', 'quantity')
     readonly_fields = ('created', 'get_html_image')
 
     def get_html_image(self, object):
@@ -99,7 +100,9 @@ class OrdersAdmin(admin.ModelAdmin):
         'product',
         'customer',
         'quantity',
-        'get_address',
+        'address',
+        'price',
+        'phone',
         'status',
         'get_status_emoji',
     )
@@ -109,9 +112,6 @@ class OrdersAdmin(admin.ModelAdmin):
     list_filter = ('status',)
 
     empty_value_display = '-пусто-'
-
-    def get_address(self, object):
-        return object.customer.address
 
     def get_status_emoji(self, object):
         if object.status == "accepted":
@@ -124,8 +124,6 @@ class OrdersAdmin(admin.ModelAdmin):
             return mark_safe(f"&#128994;")
 
     get_status_emoji.short_description = ""
-
-    get_address.short_description = "Адрес отправки"
 
     class Meta:
         verbose_name_plural = 'Заказы'

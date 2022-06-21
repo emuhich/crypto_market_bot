@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from keyboards.inline.callback_datas import catalog_callback, sub_category_callback, show_product_callback
+from keyboards.inline.callback_datas import catalog_callback, sub_category_callback, show_product_callback, \
+    buy_product_callback
 
 
 def catalog_keyboard(start, end, next, back, categories):
@@ -109,10 +110,14 @@ def sub_category_keyboard(start, end, next, back, products, pk):
     return keyboard
 
 
-def product_keyboard(pk_sub_categories, pk_products):
+def product_keyboard(pk_sub_categories, pk_product, quantity):
     keyboard = InlineKeyboardMarkup(row_width=1)
     bay_button = InlineKeyboardButton(text="💳 Купить",
-                                      callback_data=pk_products)
+                                      callback_data=buy_product_callback.new(command_name="buy_product",
+                                                                             pk_sub_categories=pk_sub_categories,
+                                                                             pk=pk_product,
+                                                                             quantity=quantity
+                                                                             ))
     back_button = InlineKeyboardButton(text="⬅️ Назад",
                                        callback_data=sub_category_callback.new(command_name="back_products",
                                                                                pk=pk_sub_categories,

@@ -5,3 +5,4 @@ class States(StatesGroup):
     CHANGE_FIO = State()
     CHANGE_ADDRESS = State()
     CHANGE_PHONE = State()
+    QUANTITY_PRODUCTS = State()

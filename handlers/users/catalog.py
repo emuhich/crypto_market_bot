@@ -124,7 +124,7 @@ async def show_all_sub_category(call: CallbackQuery, callback_data: dict, state:
     ), reply_markup=sub_category_keyboard(start=start, end=end, next=next, back=back, products=products, pk=pk))
 
 
-@dp.callback_query_handler(show_product_callback.filter(command_name="show_product"))
+@dp.callback_query_handler(show_product_callback.filter(command_name="show_product"), state="*")
 async def show_products(call: CallbackQuery, callback_data: dict, state: FSMContext):
     await call.message.delete()
     await state.finish()
@@ -139,4 +139,4 @@ async def show_products(call: CallbackQuery, callback_data: dict, state: FSMCont
             f'{hbold("В наличии:")} {product.quantity} шт.',
 
         ]
-    ), reply_markup=product_keyboard(pk_sub_categories, pk_products))
+    ), reply_markup=product_keyboard(pk_sub_categories, pk_products, product.quantity))

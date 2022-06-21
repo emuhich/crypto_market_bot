@@ -1,0 +1,224 @@
+{% load adminlte_helpers i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    {% block title_outer %}
+    <title>{% block title %}{{ site.name }}{% endblock %}</title>
+    {% endblock %}
+
+    {% block meta %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    {% endblock %}
+
+    {% block stylesheets %}
+    {% include 'adminlte/lib/_styles.html' %}
+    {% block style_sheets %}{% endblock %}
+    {% endblock %}
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="hold-transition sidebar-mini {% block body_class %}{% block bodyclass %}layout-fixed {% endblock %}{% endblock %}">
+
+{% block body %}
+<div class="wrapper">
+    {% block nav_header %}
+    {% include 'adminlte/lib/_main_header.html' %}
+    {% endblock %}
+
+    {% block nav_sidebar %}
+    {% include 'adminlte/lib/_main_sidebar.html' %}
+    {% endblock %}
+
+    {% block content_wrapper %}
+    <div class="content-wrapper">
+        {% block content_header %}
+        <section class="content-header">
+            {% block no_heading %}
+            <h1>
+                {% block page_name %}{% endblock %}
+                <div class="header-actions">
+                    {% block page_actions %}{% endblock %}
+                </div>
+                {% block no_description %}
+                <small>{% block page_description %}{% endblock %}</small>
+                {% endblock %}
+            </h1>
+            {% block breadcrumbs %}
+            {# Breadcrumb implementation left to developers #}
+            {% endblock %}
+            {% endblock no_heading %}
+        </section>
+        {% endblock %}
+
+        {% block content_outer %}
+        <section class="content">
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3>{{ count_orders }}</h3>
+
+                            <p>Всего заказов</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-bag"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3>{{ delivered_orders }}</h3>
+
+                            <p>Доставлено заказов</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-stats-bars"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>{{ count_clients }}</h3>
+
+                            <p>Зарегистрировалось клиентов</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-person-add"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-secondary">
+                        <div class="inner">
+                            <h3>{{ amount_orders }} USDT</h3>
+
+                            <p>Общая сумма заказов</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-cash"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- ./col -->
+            </div>
+            <div class="col-sm-6">
+                <div class="card card-info">
+                    <div class="card-header d-flex p-0">
+                        <h3 class="card-title p-3">Отчеты</h3>
+                        <ul class="nav nav-pills ml-auto p-2">
+                            <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">За день</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">За неделю</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">За месяц</a></li>
+                        </ul>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab_1">
+                                📈 Было проданно: {{ count_orders_today }} шт.<br>
+                                💵 Общая сумма товаров {{ amount_orders_today }} USDT.<br>
+                                📊 Чистая прибыль: {{ cost_price_today }} <br>
+                                🤟 Зарегистрировалось пользователей: {{ count_clients_today }}
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_2">
+                                📈 Было проданно: {{ count_orders_week }} шт.<br>
+                                💵 Общая сумма товаров {{ amount_orders_week }} USDT. <br>
+                                📊 Чистая прибыль: {{ cost_price_week }} <br>
+                                🤟 Зарегистрировалось пользователей: {{ count_clients_week }}
+                            </div>
+                            <!-- /.tab-pane -->
+                            <div class="tab-pane" id="tab_3">
+                                📈 Было проданно: {{ count_orders_months }} шт.<br>
+                                💵 Общая сумма товаров {{ amount_orders_months }} USDT.<br>
+                                📊 Чистая прибыль: {{ cost_price_months }} <br>
+                                🤟 Зарегистрировалось пользователей: {{ count_clients_months }}
+                            </div>
+                            <!-- /.tab-pane -->
+                        </div>
+                        <!-- /.tab-content -->
+                    </div><!-- /.card-body -->
+                </div>
+            </div>
+            <div class="col-sm-6">
+                {% if is_mailing %}
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-check"></i> Успех!</h5>
+                    Сообщение отправлено {{ count_users }} пользователям.
+                </div>
+                {% endif %}
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Рассылка сообщений</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'panel:statistics' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <!-- textarea -->
+                                    <div class="form-group">
+                                        {% for field in form %}
+                                        <div class="form-group row my-6">
+                                            <label for="{{ field.id_for_label }}">
+                                                <ya-tr-span
+                                                        data-index="141-0" data-translated="true"
+                                                        data-source-lang="en" data-target-lang="ru"
+                                                        data-value="Textarea" data-translation="Текстовая область"
+                                                        data-type="trSpan">{{ field.label }}
+                                                </ya-tr-span>
+                                            </label>
+                                            {{ field }}
+                                            {% if field.help_text %}
+                                            <small
+                                                    id="{{ field.id_for_label }}-help"
+                                                    class="form-text text-muted"
+                                            >
+                                                {{ field.help_text|safe }}
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-block bg-gradient-success btn-lg">
+                                                Отправить всем
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+
+    </div>
+    {% endblock content_wrapper %}
+
+    {% block nav_footer %}
+    {% include 'adminlte/lib/_main_footer.html' %}
+    {% endblock %}
+
+
+</div>
+{% endblock body %}
+
+{% block javascript %}
+{% include 'adminlte/lib/_scripts.html' %}
+{% block js %}{% endblock %}
+{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
+{% block extra_foot %}{% endblock %}
+</body>
+</html>

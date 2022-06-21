@@ -1,7 +1,15 @@
+import os
+
+import requests
+from aiogram.utils.markdown import hbold
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.signals import post_save, post_init
+from dotenv import load_dotenv
 
+load_dotenv()
 User = get_user_model()
+BOT_TOKEN = str(os.getenv("BOT_TOKEN"))
 
 
 class CreatedModel(models.Model):
@@ -101,8 +109,14 @@ class Product(CreatedModel):
         help_text='Ссылка на картинку товара',
         verbose_name='Картинка'
     )
+    cost_price = models.IntegerField(
+        help_text='Себестоимость продукта в USDT',
+        verbose_name='Себестоимость',
+        blank=True,
+        null=True
+    )
     price = models.IntegerField(
-        help_text='Цена продукта',
+        help_text='Цена продукта в USDT',
         verbose_name='Цена'
     )
     quantity = models.IntegerField(
@@ -161,6 +175,8 @@ class Client(CreatedModel):
 
 
 class Orders(CreatedModel):
+    previous_state = None
+
     THEME_CHOICES = (
         ('accepted', 'принят в обработку'),
         ('processed', 'обработан'),
@@ -185,11 +201,35 @@ class Orders(CreatedModel):
         help_text='Заказчик',
         verbose_name='Заказчик'
     )
+    address = models.TextField(
+        help_text='Адрес клиента',
+        verbose_name='Адрес',
+        blank=True,
+        null=True
+    )
+    phone = models.CharField(
+        max_length=50,
+        help_text='Номер телефона клиента',
+        verbose_name='Номер телефона',
+        blank=True,
+        null=True
+    )
     quantity = models.IntegerField(
         help_text='Количетсво продукта',
         verbose_name='Количество',
         default=1
     )
+    price = models.IntegerField(
+        help_text='Сумма заказа в USDT',
+        verbose_name='Сумма'
+    )
+    cost_price = models.IntegerField(
+        help_text='Себестоимость заказа в USDT',
+        verbose_name='Себестоимость',
+        blank=True,
+        null=True
+    )
+
     status = models.CharField(
         choices=THEME_CHOICES,
         default='accepted',
@@ -197,6 +237,28 @@ class Orders(CreatedModel):
         help_text='Статус заказа',
         verbose_name='Статус',
     )
+
+    @staticmethod
+    def post_save(sender, instance, created, **kwargs):
+        if instance.previous_state != instance.status:
+            if instance.status == 'accepted':
+                status = "принят в обработку"
+            elif instance.status == 'processed':
+                status = "обработан"
+            elif instance.status == 'in_delivery':
+                status = "передан в доставку"
+            else:
+                status = "доставлен"
+
+            requests.get(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/"
+                f"sendMessage?chat_id={instance.customer.telegram_id}&text="
+                f"{hbold('Статус вашего заказа:')} {instance.product.name}, {hbold(f'изменен на «{status}»')},&parse_mode=html"
+            )
+
+    @staticmethod
+    def remember_state(sender, instance, **kwargs):
+        instance.previous_state = instance.status
 
     class Meta:
         verbose_name = 'Заказы'
@@ -245,3 +307,7 @@ class TokenBinance(models.Model):
 
     def __str__(self):
         return self.token
+
+
+post_save.connect(Orders.post_save, sender=Orders)
+post_init.connect(Orders.remember_state, sender=Orders)

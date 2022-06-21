@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import CommandStart
 
 from keyboards.inline.start_keyboard import start_keyboard
 from loader import dp
-from utils.db_api.db_commands import select_client, create_client
+from utils.db_api.db_commands import select_client, create_client, check_client
 
 
 @dp.message_handler(CommandStart(), state='*')
@@ -12,7 +12,7 @@ async def bot_start_no_state(message: types.Message, state: FSMContext):
     await message.delete()
     await state.finish()
     user_id = message.from_user.id
-    user = await select_client(user_id)
+    user = await check_client(user_id)
     if not user:
         await create_client(username=message.from_user.username, telegram_id=user_id)
 

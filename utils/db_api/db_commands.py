@@ -1,7 +1,7 @@
 from asgiref.sync import sync_to_async
 from django.shortcuts import get_object_or_404
 
-from admin_panel.telebot.models import Product, Client, Questions, Category, SubCategory
+from admin_panel.telebot.models import Product, Client, Questions, Category, SubCategory, TokenBinance, Orders
 
 
 @sync_to_async
@@ -12,6 +12,11 @@ def select_all_products():
 @sync_to_async()
 def select_client(telegram_id):
     return Client.objects.get(telegram_id=telegram_id)
+
+
+@sync_to_async()
+def check_client(telegram_id):
+    return Client.objects.filter(telegram_id=telegram_id).exists()
 
 
 @sync_to_async()
@@ -76,3 +81,29 @@ def get_products(pk):
 @sync_to_async
 def get_product(pk):
     return Product.objects.get(pk=pk)
+
+
+@sync_to_async
+def get_binance_key():
+    obj_list = TokenBinance.objects.all()
+    client = obj_list[0]
+    return client.token, client.secret_key
+
+
+@sync_to_async()
+def create_order(pk, telegram_id, quantity):
+    product = Product.objects.get(pk=pk)
+    product.quantity -= quantity
+    product.save()
+    client = Client.objects.get(telegram_id=telegram_id)
+    order = Orders()
+    order.product = product
+    order.customer = client
+    order.address = client.address
+    order.phone = client.phone
+    order.quantity = quantity
+    order.price = product.price * quantity
+    order.status = 'accepted'
+    if product.cost_price:
+        order.cost_price = product.cost_price * quantity
+    order.save()

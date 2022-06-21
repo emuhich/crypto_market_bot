@@ -20,3 +20,10 @@ def back_to_profile():
     back_button = InlineKeyboardButton(text="⬅️ Назад", callback_data="profile")
     keyboard.insert(back_button)
     return keyboard
+
+
+def my_profile_keyboard():
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    back_button = InlineKeyboardButton(text="👤 Мой профиль", callback_data="profile")
+    keyboard.insert(back_button)
+    return keyboard

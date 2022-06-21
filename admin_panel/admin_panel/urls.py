@@ -15,13 +15,12 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from django.conf.urls.static import static
 
-
-
 urlpatterns = [
+    path('statistics/', include('admin_panel.telebot.urls', namespace='panel')),
     path('', admin.site.urls),
 
 ]
