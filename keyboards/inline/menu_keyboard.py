@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from keyboards.inline.callback_datas import faq_callback, catalog_callback
+from keyboards.inline.callback_datas import faq_callback, catalog_callback, my_order_callback
 
 menu_keyboard = InlineKeyboardMarkup(row_width=1)
 catalog_button = InlineKeyboardButton(text="🗂 Каталог", callback_data=catalog_callback.new(
@@ -8,7 +8,12 @@ catalog_button = InlineKeyboardButton(text="🗂 Каталог", callback_data=
     start=0,
     end=8
 ))
-my_orders_button = InlineKeyboardButton(text="🛒 Мои заказы", callback_data="my_orders")
+
+my_orders_button = InlineKeyboardButton(text="🛒 Мои заказы", callback_data=my_order_callback.new(
+    command_name="my_orders",
+    start=0,
+    end=8
+))
 support_button = InlineKeyboardButton(text="👨🏻‍💻 Поддержка", callback_data="support")
 profile_button = InlineKeyboardButton(text="👤 Мой профиль", callback_data="profile")
 FAQ_button = InlineKeyboardButton(text="❔ FAQ", callback_data=faq_callback.new(

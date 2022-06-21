@@ -107,3 +107,14 @@ def create_order(pk, telegram_id, quantity):
     if product.cost_price:
         order.cost_price = product.cost_price * quantity
     order.save()
+
+
+@sync_to_async()
+def get_orders_by_user_id(telegram_id):
+    user = Client.objects.get(telegram_id=telegram_id)
+    return user.customer.all().order_by('-updated')
+
+
+@sync_to_async()
+def get_order(pk):
+    return Orders.objects.get(pk=pk)
