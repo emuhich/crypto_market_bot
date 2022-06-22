@@ -309,5 +309,17 @@ class TokenBinance(models.Model):
         return self.token
 
 
+class BinanceOperationId(models.Model):
+    txId = models.CharField(
+        max_length=300,
+        help_text='Уникальный ID платежа',
+        verbose_name='ID платежка',
+        unique=True
+    )
+
+    def __str__(self):
+        return self.txId
+
+
 post_save.connect(Orders.post_save, sender=Orders)
 post_init.connect(Orders.remember_state, sender=Orders)

@@ -1,10 +1,12 @@
+from decimal import Decimal
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hbold, hlink
 
 from data.config import SUPPORT_LINK
-from keyboards.inline.buy_products import back_to_product, check_payment
+from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found
 from keyboards.inline.callback_datas import buy_product_callback
 from keyboards.inline.orders_keyboard import keyboard_my_orders
 from keyboards.inline.profile import my_profile_keyboard
@@ -88,6 +90,11 @@ async def get_binance_address(message: types.Message, state: FSMContext):
         btc_address = await client.get_address_btc()
         eth_address = await client.get_address_eth()
         usd_address = await client.get_address_usd()
+        commission = await client.get_rand_commission()
+        amount_usd = count * product.price + commission
+        amount_btc, amount_eth = await client.get_price_btc_eth(count * product.price)
+        amount_btc += commission
+        amount_eth += commission
     except Exception:
         await message.answer(f"❌ Произошла ошибка при подключении к бинанс,"
                              f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
@@ -100,18 +107,20 @@ async def get_binance_address(message: types.Message, state: FSMContext):
                 hbold("Заказ: "),
                 f'Название: {product.name}',
                 f'Количество: {count} шт',
-                f'Итоговая цена: {count * product.price} USDT\n',
                 f'Введите новое количество товара под этим сообщением:\n',
-                f'Сумма в BTC: {count * product.price}',
+                f'Сумма в BTC: {amount_btc}',
                 f'BTC кошелек: {btc_address}\n',
-                f'Сумма в ETH: {count * product.price}',
+                f'Сумма в ETH: {amount_eth}',
                 f'ETH кошелек: {eth_address}\n',
-                f'Сумма в USDT: {count * product.price}',
+                f'Сумма в USDT: {amount_usd}',
                 f'USDT кошелек: {usd_address}\n',
+                hbold('⚠️ Важно при каждом платеже генерируется уникальная комиссия, она никак не '
+                      'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать'
+                      'до каждой цифры.\n'),
                 f'После оплаты нажмите кнопку «Проверить платеж» с валютой в которой вы оплатитли.'
 
             ]
-        ), reply_markup=check_payment(pk, pk_sub_categories, count)
+        ), reply_markup=check_payment(pk, pk_sub_categories, count, amount_usd, amount_btc, amount_eth)
     )
 
 
@@ -120,7 +129,32 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
     await state.finish()
     pk = int(callback_data.get("pk"))
     quantity = int(callback_data.get("quantity"))
+    coin = callback_data.get("coin")
+    price = Decimal(callback_data.get("price"))
     pk_sub_categories = int(callback_data.get("pk_sub_categories"))
+    client = Binance()
+    result = await client.check_payment(amount=price, coin=coin)
+    if result == "NotFound":
+        await call.message.edit_text("\n".join(
+            [
+                f'{hbold(f"❌ Платеж не найден")}\n',
+                f'Мы не нашли ваш платеж, если вы оплатитли нажмите кнопку проверить платеж снизу,'
+                f'через 10 минут, или обратитесь в техх поддержку.',
+                hbold('⚠️ Проверить платежно можно будет только по кнопке снизу ❗️')
+            ]
+        ), reply_markup=payment_not_found(pk, quantity, price, coin, pk_sub_categories)
+        )
+        return
+    if result == "NotConfirmed":
+        await call.message.edit_text("\n".join(
+            [
+                f'{hbold(f"⚠️ Платеж найден, но еще не подтвержден")}\n',
+                f'Проверьте оплату позже',
+                hbold('⚠️ Проверить платежно можно будет только по кнопке снизу ❗️')
+            ]
+        ), reply_markup=confirm_payment(pk, quantity, price, coin)
+        )
+        return
     telegram_id = call.message.chat.id
     await create_order(pk, telegram_id, quantity)
     await call.message.edit_text("\n".join(

@@ -1,7 +1,8 @@
 from asgiref.sync import sync_to_async
 from django.shortcuts import get_object_or_404
 
-from admin_panel.telebot.models import Product, Client, Questions, Category, SubCategory, TokenBinance, Orders
+from admin_panel.telebot.models import Product, Client, Questions, Category, SubCategory, TokenBinance, Orders, \
+    BinanceOperationId
 
 
 @sync_to_async
@@ -116,5 +117,15 @@ def get_orders_by_user_id(telegram_id):
 
 
 @sync_to_async()
-def get_order(pk):
-    return Orders.objects.get(pk=pk)
+def get_order(txId):
+    return BinanceOperationId(txId=txId).save()
+
+
+@sync_to_async()
+def create_payment_id(txId):
+    return BinanceOperationId.objects.filter(txId=txId).exists()
+
+
+@sync_to_async()
+def check_payment_id(txId):
+    return BinanceOperationId.objects.filter(txId=txId).exists()
