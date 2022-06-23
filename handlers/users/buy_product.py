@@ -7,7 +7,7 @@ from aiogram.utils.markdown import hbold, hlink
 
 from data.config import SUPPORT_LINK
 from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found
-from keyboards.inline.callback_datas import buy_product_callback
+from keyboards.inline.callback_datas import buy_product_callback, check_payment_callback
 from keyboards.inline.orders_keyboard import keyboard_my_orders
 from keyboards.inline.profile import my_profile_keyboard
 from loader import dp
@@ -124,7 +124,7 @@ async def get_binance_address(message: types.Message, state: FSMContext):
     )
 
 
-@dp.callback_query_handler(buy_product_callback.filter(command_name="check_payment"))
+@dp.callback_query_handler(check_payment_callback.filter(command_name="check_payment"))
 async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContext):
     await state.finish()
     pk = int(callback_data.get("pk"))

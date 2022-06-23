@@ -30,7 +30,8 @@ def check_payment(pk_products, pk_sub_categories, quantity, amount_usd, amount_b
                                                                                      pk=pk_products,
                                                                                      quantity=quantity,
                                                                                      coin="ETH",
-                                                                                     price=amount_eth
+                                                                                     price=amount_eth,
+                                                                                     pk_sub_categories=pk_sub_categories
                                                                                      ))
     check_usd_button = InlineKeyboardButton(text="Проверить платеж USDT",
                                             callback_data=check_payment_callback.new(command_name="check_payment",
