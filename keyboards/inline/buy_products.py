@@ -52,14 +52,15 @@ def check_payment(pk_products, pk_sub_categories, quantity, amount_usd, amount_b
     return keyboard
 
 
-def confirm_payment(pk, quantity, price, coin):
+def confirm_payment(pk, quantity, price, coin,pk_sub_categories):
     keyboard = InlineKeyboardMarkup(row_width=1)
     check_button = InlineKeyboardButton(text="Проверить платеж",
                                         callback_data=check_payment_callback.new(command_name="check_payment",
                                                                                  pk=pk,
                                                                                  quantity=quantity,
                                                                                  coin=coin,
-                                                                                 price=price
+                                                                                 price=price,
+                                                                                 pk_sub_categories=pk_sub_categories
                                                                                  ))
     support_button = InlineKeyboardButton(text="👨🏻‍💻 Поддержка", url=SUPPORT_LINK)
     keyboard.insert(check_button)
@@ -74,7 +75,8 @@ def payment_not_found(pk, quantity, price, coin, pk_sub_categories):
                                                                                  pk=pk,
                                                                                  quantity=quantity,
                                                                                  coin=coin,
-                                                                                 price=price
+                                                                                 price=price,
+                                                                                 pk_sub_categories=pk_sub_categories
                                                                                  ))
     support_button = InlineKeyboardButton(text="👨🏻‍💻 Поддержка", url=SUPPORT_LINK)
     back_button = InlineKeyboardButton(text="⬅️ Назад к товару",

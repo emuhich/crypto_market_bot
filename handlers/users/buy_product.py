@@ -152,7 +152,7 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
                 f'Проверьте оплату позже',
                 hbold('⚠️ Проверить платежно можно будет только по кнопке снизу ❗️')
             ]
-        ), reply_markup=confirm_payment(pk, quantity, price, coin)
+        ), reply_markup=confirm_payment(pk, quantity, price, coin, pk_sub_categories)
         )
         return
     telegram_id = call.message.chat.id
