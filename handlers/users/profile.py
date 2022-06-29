@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hbold
 
 from keyboards.inline.profile import profile_keyboard, back_to_profile
-from loader import dp
+from loader import dp, bot
 from states.states import States
 from utils.db_api.db_commands import select_client, update_client_info
 
@@ -40,7 +40,7 @@ async def show_menu_callback(call: CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(text="change_fio")
-async def show_menu_callback(call: CallbackQuery):
+async def show_menu_callback(call: CallbackQuery, state: FSMContext):
     user_id = call.message.chat.id
     user = await select_client(user_id)
     if not user.full_name:
@@ -58,11 +58,14 @@ async def show_menu_callback(call: CallbackQuery):
         ]
     ), reply_markup=back_to_profile())
     await States.CHANGE_FIO.set()
+    await state.update_data(message_id=call.message.message_id)
 
 
 @dp.message_handler(state=States.CHANGE_FIO)
-async def set_fbs_api(message: types.Message):
+async def set_fbs_api(message: types.Message, state: FSMContext):
     await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
     user_id = message.from_user.id
     fio = message.text
     user = await update_client_info(telegram_id=user_id, fio=fio)
@@ -71,7 +74,7 @@ async def set_fbs_api(message: types.Message):
     else:
         full_name = user.full_name
 
-    await message.answer(text="\n".join(
+    await bot.edit_message_text(text="\n".join(
         [
             f'{hbold(f"🏷 Изменить ФИО")}\n',
             f'{hbold("Текущее ФИО:")} {full_name}\n',
@@ -79,11 +82,11 @@ async def set_fbs_api(message: types.Message):
             f'✅ Пример: Соколов Антон Антонович',
 
         ]
-    ), reply_markup=back_to_profile())
+    ), reply_markup=back_to_profile(), message_id=message_id, chat_id=message.chat.id)
 
 
 @dp.callback_query_handler(text="change_address")
-async def show_menu_callback(call: CallbackQuery):
+async def show_menu_callback(call: CallbackQuery, state: FSMContext):
     user_id = call.message.chat.id
     user = await select_client(user_id)
     if not user.address:
@@ -101,11 +104,14 @@ async def show_menu_callback(call: CallbackQuery):
         ]
     ), reply_markup=back_to_profile())
     await States.CHANGE_ADDRESS.set()
+    await state.update_data(message_id=call.message.message_id)
 
 
 @dp.message_handler(state=States.CHANGE_ADDRESS)
-async def set_fbs_api(message: types.Message):
+async def set_fbs_api(message: types.Message, state: FSMContext):
     await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
     user_id = message.from_user.id
     address = message.text
     user = await update_client_info(telegram_id=user_id, address=address)
@@ -114,7 +120,7 @@ async def set_fbs_api(message: types.Message):
     else:
         address = user.address
 
-    await message.answer(text="\n".join(
+    await bot.edit_message_text(text="\n".join(
         [
             f'{hbold(f"📨 Изменить Адрес")}\n',
             f'{hbold("Текущий Адрес:")} {address}\n',
@@ -122,11 +128,11 @@ async def set_fbs_api(message: types.Message):
             f'✅ Пример: Большая Никитская улица, г.Москва д.8, кв.56',
 
         ]
-    ), reply_markup=back_to_profile())
+    ), reply_markup=back_to_profile(),message_id=message_id, chat_id=message.chat.id)
 
 
 @dp.callback_query_handler(text="change_phone")
-async def show_menu_callback(call: CallbackQuery):
+async def show_menu_callback(call: CallbackQuery, state: FSMContext):
     user_id = call.message.chat.id
     user = await select_client(user_id)
     if not user.phone:
@@ -144,11 +150,14 @@ async def show_menu_callback(call: CallbackQuery):
         ]
     ), reply_markup=back_to_profile())
     await States.CHANGE_PHONE.set()
+    await state.update_data(message_id=call.message.message_id)
 
 
 @dp.message_handler(state=States.CHANGE_PHONE)
-async def set_fbs_api(message: types.Message):
+async def set_fbs_api(message: types.Message, state: FSMContext):
     await message.delete()
+    data = await state.get_data()
+    message_id = data.get("message_id")
     user_id = message.from_user.id
     phone = message.text
     user = await update_client_info(telegram_id=user_id, phone=phone)
@@ -157,7 +166,7 @@ async def set_fbs_api(message: types.Message):
     else:
         phone = user.phone
 
-    await message.answer(text="\n".join(
+    await bot.edit_message_text(text="\n".join(
         [
             f'{hbold(f"📱 Изменить телефон")}\n',
             f'{hbold("Текущий телефон:")} {phone}\n',
@@ -165,4 +174,4 @@ async def set_fbs_api(message: types.Message):
             f'✅ Пример: 79779567811',
 
         ]
-    ), reply_markup=back_to_profile())
+    ), reply_markup=back_to_profile(),message_id=message_id, chat_id=message.chat.id)

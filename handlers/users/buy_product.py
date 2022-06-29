@@ -91,7 +91,8 @@ async def get_binance_address(message: types.Message, state: FSMContext):
         eth_address = await client.get_address_eth()
         usd_address = await client.get_address_usd()
         commission = await client.get_rand_commission()
-        amount_usd = count * product.price + commission
+        commission_usd = await client.get_rand_commission_usdt()
+        amount_usd = (count * product.price) + commission_usd
         amount_btc, amount_eth = await client.get_price_btc_eth(count * product.price)
         amount_btc += commission
         amount_eth += commission

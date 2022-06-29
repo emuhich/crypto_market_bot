@@ -18,6 +18,10 @@ class Binance:
     async def get_rand_commission():
         return Decimal(randint(1, 10000)) * Decimal("0.000001")
 
+    @staticmethod
+    async def get_rand_commission_usdt():
+        return Decimal(randint(1, 1000)) * Decimal("0.0001")
+
     async def get_address_btc(self):
         client = await self.get_client()
         address = await client.get_deposit_address(coin='BTC')
