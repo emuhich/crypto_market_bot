@@ -104,7 +104,7 @@ async def get_binance_address(message: types.Message, state: FSMContext):
                 f'{hbold(f"✅ Оплата.")}\n',
                 hbold("Заказ: "),
                 f'Название: {product.name}',
-                f'Количество: {count} шт',
+                f'Количество: {count} шт\n',
                 f'Сумма в BTC: {amount_btc}',
                 f'Сумма в ETH: {amount_eth}',
                 f'Сумма в USDT: {amount_usd}\n',
@@ -116,7 +116,8 @@ async def get_binance_address(message: types.Message, state: FSMContext):
     await state.update_data(count=count)
 
 
-@dp.callback_query_handler(choice_payment_callback.filter(command_name="choice_payment"))
+@dp.callback_query_handler(choice_payment_callback.filter(command_name="choice_payment"),
+                           state=States.QUANTITY_PRODUCTS)
 async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContext):
     data = await state.get_data()
     pk = data.get("pk")
