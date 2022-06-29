@@ -40,6 +40,12 @@ class Binance:
         await client.close_connection()
         return address['address']
 
+    async def get_address_usd_trx(self):
+        client = await self.get_client()
+        address = await client.get_deposit_address(coin='USDT', network="TRX")
+        await client.close_connection()
+        return address['address']
+
     async def get_price_btc_eth(self, amount):
         client = await self.get_client()
         tickers = await client.get_all_tickers()

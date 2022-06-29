@@ -6,8 +6,9 @@ from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hbold, hlink, hcode
 
 from data.config import SUPPORT_LINK
-from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found
-from keyboards.inline.callback_datas import buy_product_callback, check_payment_callback
+from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found, \
+    choice_payment
+from keyboards.inline.callback_datas import buy_product_callback, check_payment_callback, choice_payment_callback
 from keyboards.inline.orders_keyboard import keyboard_my_orders
 from keyboards.inline.profile import my_profile_keyboard
 from loader import dp
@@ -83,13 +84,9 @@ async def get_binance_address(message: types.Message, state: FSMContext):
         ), reply_markup=back_to_product(pk, pk_sub_categories))
         return
     count = int(message.text)
-    await state.finish()
     product = await get_product(pk)
     try:
         client = Binance()
-        btc_address = await client.get_address_btc()
-        eth_address = await client.get_address_eth()
-        usd_address = await client.get_address_usd()
         commission = await client.get_rand_commission()
         commission_usd = await client.get_rand_commission_usdt()
         amount_usd = (count * product.price) + commission_usd
@@ -108,21 +105,81 @@ async def get_binance_address(message: types.Message, state: FSMContext):
                 hbold("Заказ: "),
                 f'Название: {product.name}',
                 f'Количество: {count} шт',
-                f'Введите новое количество товара под этим сообщением:\n',
                 f'Сумма в BTC: {amount_btc}',
-                f'BTC кошелек: {hcode(btc_address)}\n',
                 f'Сумма в ETH: {amount_eth}',
-                f'ETH кошелек: {hcode(eth_address)}\n',
-                f'Сумма в USDT: {amount_usd}',
-                f'USDT кошелек: {hcode(usd_address)}\n',
-                hbold('⚠️ Важно при каждом платеже генерируется уникальная комиссия, она никак не '
-                      'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать'
-                      'до каждой цифры.\n'),
-                f'После оплаты нажмите кнопку «Проверить платеж» с валютой в которой вы оплатитли.'
+                f'Сумма в USDT: {amount_usd}\n',
+                hbold('Выберете способ оплаты которым хотите оплатить')
 
             ]
-        ), reply_markup=check_payment(pk, pk_sub_categories, count, amount_usd, amount_btc, amount_eth)
+        ), reply_markup=choice_payment(pk_products=pk, pk_sub_categories=pk_sub_categories)
     )
+    await state.update_data(count=count)
+
+
+@dp.callback_query_handler(choice_payment_callback.filter(command_name="choice_payment"))
+async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContext):
+    data = await state.get_data()
+    pk = data.get("pk")
+    pk_sub_categories = data.get("pk_sub_categories")
+    quantity = data.get("quantity")
+    count = data.get("count")
+    coin = int(callback_data.get("coin"))
+    if count > quantity:
+        await call.message.edit_text(text="\n".join(
+            [
+                f'{hbold(f"❌ Ошибка.")}\n',
+                f'К сожалению товар закаончился',
+
+            ]
+        ), reply_markup=back_to_product(pk, pk_sub_categories))
+        return
+    await state.finish()
+    product = await get_product(pk)
+    try:
+        client = Binance()
+        commission = await client.get_rand_commission()
+        commission_usd = await client.get_rand_commission_usdt()
+        amount_usd = (count * product.price) + commission_usd
+        amount_btc, amount_eth = await client.get_price_btc_eth(count * product.price)
+        amount_btc += commission
+        amount_eth += commission
+    except Exception:
+        await call.message.edit_text(f"❌ Произошла ошибка при подключении к бинанс,"
+                                     f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
+                                     reply_markup=back_to_product(pk, pk_sub_categories))
+        return
+    string = [f'{hbold(f"Платежные данные {coin}")}']
+    if coin == "BTC":
+        amount = amount_btc
+        string.append(f'Сумма: {amount}\n')
+        string.append(f'Адресс кошелька: \n{hcode("1MhT6depTHHwGjXKVhKDKfszP6a3rHMoeN")}')
+    elif coin == "ETH":
+        amount = amount_eth
+        string.append(f'Сумма: {amount}')
+        string.append(f'Кошельки: \n')
+        string.append(f'BEP20')
+        string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
+        string.append(f'ERC20')
+        string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
+    else:
+        amount = amount_usd
+        string.append(f'Сумма: {amount}')
+        string.append(f'Кошельки: \n')
+        string.append(f'BEP20')
+        string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
+        string.append(f'BEP 2')
+        string.append(hcode("bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23E\n"))
+        string.append(f'ERC20')
+        string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
+        string.append(f'TRC20')
+        string.append(hcode("TJe8ToeneKfQsFGfYnBy3nF2zfQwaZ5y4qR\n"))
+    string.append(hbold('⚠️ Важно при каждом платеже генерируется уникальная комиссия, она никак не '
+                        'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать'
+                        'до каждой цифры.\n'), )
+    string.append(f'После оплаты нажмите кнопку «Проверить платеж», деньги могут прийти не моментально.')
+    await call.message.edit_text(text="\n".join(string),
+                                 reply_markup=check_payment(pk_products=pk, pk_sub_categories=pk_sub_categories,
+                                                            quantity=quantity, amount=amount, coin=coin))
 
 
 @dp.callback_query_handler(check_payment_callback.filter(command_name="check_payment"))

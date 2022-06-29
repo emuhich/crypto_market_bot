@@ -10,3 +10,4 @@ my_order_callback = CallbackData("set", "command_name", "start", "end")
 show_orders_callback = CallbackData("set", "command_name", "pk_orders")
 check_payment_callback = CallbackData("set", "command_name", "coin", "price", "pk", "quantity",
                                       "pk_sub_categories")
+choice_payment_callback = CallbackData("set", "command_name", "coin")
