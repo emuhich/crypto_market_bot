@@ -16,7 +16,7 @@ class Binance:
 
     @staticmethod
     async def get_rand_commission():
-        return Decimal(randint(1, 1000)) * Decimal("0.00000000001")
+        return Decimal(randint(1, 1000)) * Decimal("0.000000001")
 
     @staticmethod
     async def get_rand_commission_usdt():
