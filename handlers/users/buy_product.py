@@ -153,7 +153,7 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
     if coin == "BTC":
         amount = amount_btc
         string.append(f'Сумма: {amount}\n')
-        string.append(f'Адресс кошелька: \n{hcode("1MhT6depTHHwGjXKVhKDKfszP6a3rHMoeN")}')
+        string.append(f'Адресс кошелька: \n{hcode("1MhT6depTHHwGjXKVhKDKfszP6a3rHMoeN")}\n')
     elif coin == "ETH":
         amount = amount_eth
         string.append(f'Сумма: {amount}')
