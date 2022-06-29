@@ -16,7 +16,7 @@ class Binance:
 
     @staticmethod
     async def get_rand_commission():
-        return Decimal(randint(1, 10000)) * Decimal("0.000001")
+        return Decimal(randint(1, 1000)) * Decimal("0.00000000001")
 
     @staticmethod
     async def get_rand_commission_usdt():
@@ -44,11 +44,11 @@ class Binance:
         client = await self.get_client()
         tickers = await client.get_all_tickers()
         for ticker in tickers:
-            if ticker['symbol'] == "SUSDBTC":
-                amount_btc = amount * Decimal(ticker['price'])
+            if ticker['symbol'] == "BTCUSDT":
+                amount_btc = round(amount / Decimal(ticker['price']), 7)
 
-            if ticker['symbol'] == "SUSDETH":
-                amount_eth = amount * Decimal(ticker['price'])
+            if ticker['symbol'] == "ETHUSDT":
+                amount_eth = round(amount / Decimal(ticker['price']), 7)
         await client.close_connection()
         return amount_btc, amount_eth
 

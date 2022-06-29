@@ -3,7 +3,7 @@ from decimal import Decimal
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
-from aiogram.utils.markdown import hbold, hlink
+from aiogram.utils.markdown import hbold, hlink, hcode
 
 from data.config import SUPPORT_LINK
 from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found
@@ -110,11 +110,11 @@ async def get_binance_address(message: types.Message, state: FSMContext):
                 f'Количество: {count} шт',
                 f'Введите новое количество товара под этим сообщением:\n',
                 f'Сумма в BTC: {amount_btc}',
-                f'BTC кошелек: {btc_address}\n',
+                f'BTC кошелек: {hcode(btc_address)}\n',
                 f'Сумма в ETH: {amount_eth}',
-                f'ETH кошелек: {eth_address}\n',
+                f'ETH кошелек: {hcode(eth_address)}\n',
                 f'Сумма в USDT: {amount_usd}',
-                f'USDT кошелек: {usd_address}\n',
+                f'USDT кошелек: {hcode(usd_address)}\n',
                 hbold('⚠️ Важно при каждом платеже генерируется уникальная комиссия, она никак не '
                       'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать'
                       'до каждой цифры.\n'),
