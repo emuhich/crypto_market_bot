@@ -124,7 +124,7 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
     pk_sub_categories = data.get("pk_sub_categories")
     quantity = data.get("quantity")
     count = data.get("count")
-    coin = int(callback_data.get("coin"))
+    coin = callback_data.get("coin")
     if count > quantity:
         await call.message.edit_text(text="\n".join(
             [
