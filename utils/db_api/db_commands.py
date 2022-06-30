@@ -118,7 +118,7 @@ def get_orders_by_user_id(telegram_id):
 
 @sync_to_async()
 def get_order(pk_orders):
-    return Orders.objects.get(pk_orders=pk_orders)
+    return Orders.objects.get(pk=pk_orders)
 
 
 @sync_to_async()
