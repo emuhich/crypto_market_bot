@@ -38,6 +38,10 @@ def quantity_keyboard(pk_products, pk_sub_categories, quantity, number):
                                                                                pk_products=pk_products,
                                                                                pk_sub_categories=pk_sub_categories
                                                                                ))
+    keyboard.row(minus_quantity, quantity_button, plus_quantity)
+    keyboard.row(next_button)
+    keyboard.row(back_button)
+    return keyboard
 
 
 def back_to_product(pk_products, pk_sub_categories):
