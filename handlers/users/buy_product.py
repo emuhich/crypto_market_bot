@@ -6,7 +6,7 @@ from aiogram.utils.markdown import hbold, hlink, hcode
 
 from data.config import SUPPORT_LINK
 from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found, \
-    choice_payment, quantity_keyboard
+    choice_payment
 from keyboards.inline.callback_datas import buy_product_callback, check_payment_callback, choice_payment_callback
 from keyboards.inline.orders_keyboard import keyboard_my_orders
 from keyboards.inline.profile import my_profile_keyboard
@@ -15,20 +15,15 @@ from utils.db_api.db_commands import get_product, select_client, create_order
 from utils.misc.binance import Binance
 
 
-@dp.callback_query_handler(buy_product_callback.filter(command_name="buy_product"))
-async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContext):
-    await call.message.delete()
-    await state.finish()
+@dp.callback_query_handler(buy_product_callback.filter(command_name="confirm_pay"))
+async def get_binance_address(call: CallbackQuery, callback_data: dict):
     pk = int(callback_data.get("pk"))
     number = int(callback_data.get("number"))
     quantity = int(callback_data.get("quantity"))
     pk_sub_categories = int(callback_data.get("pk_sub_categories"))
+    product = await get_product(pk)
     user_id = call.message.chat.id
     user = await select_client(user_id)
-    if number > quantity:
-        number = 1
-    if number < 1:
-        number = quantity
     if not user.full_name or not user.address or not user.phone:
         await call.message.answer(
             text="\n".join(
@@ -43,21 +38,6 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
                 ]
             ), reply_markup=my_profile_keyboard())
         return
-    await call.message.answer(text="\n".join(
-        [
-            f'{hbold(f"Выберете количество товара и нажмите продолжить")}\n',
-
-        ]
-    ), reply_markup=quantity_keyboard(pk, pk_sub_categories, quantity, number))
-
-
-@dp.callback_query_handler(buy_product_callback.filter(command_name="confirm_pay"))
-async def get_binance_address(call: CallbackQuery, callback_data: dict):
-    pk = int(callback_data.get("pk"))
-    number = int(callback_data.get("number"))
-    quantity = int(callback_data.get("quantity"))
-    pk_sub_categories = int(callback_data.get("pk_sub_categories"))
-    product = await get_product(pk)
     try:
         client = Binance()
         commission = await client.get_rand_commission()
@@ -150,7 +130,7 @@ async def buy_product(call: CallbackQuery, callback_data: dict):
     string.append(f'После оплаты нажмите кнопку «Проверить платеж», деньги могут прийти не моментально.')
     await call.message.edit_text(text="\n".join(string),
                                  reply_markup=check_payment(pk_products=pk, pk_sub_categories=pk_sub_categories,
-                                                            quantity=quantity, amount=amount, coin=coin))
+                                                            quantity=quantity, amount=amount, coin=coin,number=number))
 
 
 @dp.callback_query_handler(check_payment_callback.filter(command_name="check_payment"))

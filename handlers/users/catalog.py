@@ -131,6 +131,11 @@ async def show_products(call: CallbackQuery, callback_data: dict, state: FSMCont
     pk_products = int(callback_data.get("pk_products"))
     pk_sub_categories = int(callback_data.get("pk_sub_categories"))
     product = await get_product(pk_products)
+    number = int(callback_data.get("number"))
+    if number > product.quantity:
+        number = 1
+    if number < 1:
+        number = product.quantity
     await call.message.answer_photo(photo=product.image, caption="\n".join(
         [
             f'{hbold(product.name)}\n',
@@ -139,4 +144,4 @@ async def show_products(call: CallbackQuery, callback_data: dict, state: FSMCont
             f'{hbold("В наличии:")} {product.quantity} шт.',
 
         ]
-    ), reply_markup=product_keyboard(pk_sub_categories, pk_products, product.quantity))
+    ), reply_markup=product_keyboard(pk_sub_categories, pk_products, product.quantity, number))
