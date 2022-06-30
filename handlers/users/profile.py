@@ -33,7 +33,6 @@ async def show_menu_callback(call: CallbackQuery, state: FSMContext):
             f'{hbold("ФИО:")} {full_name}\n',
             f'{hbold("Адрес:")} {address}\n',
             f'{hbold("Телефон:")} {phone}\n',
-            f'Для совершения покупок установите Адрес, ФИО и номер телефона по которому с вами можно связаться',
 
         ]
     ), reply_markup=profile_keyboard())

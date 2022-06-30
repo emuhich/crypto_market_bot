@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import CommandStart
 
 from keyboards.inline.start_keyboard import start_keyboard
 from loader import dp
-from utils.db_api.db_commands import select_client, create_client, check_client
+from utils.db_api.db_commands import create_client, check_client
 
 
 @dp.message_handler(CommandStart(), state='*')
@@ -18,11 +18,10 @@ async def bot_start_no_state(message: types.Message, state: FSMContext):
 
     await message.answer(text="\n".join(
         [
-            f'Приветственное сообщение'
-            'Тут рассказываем о сервисе,'
-            'преимуществах, почему необходимо'
-            'поделиться с нами своими личными'
-            'данными и тд и тд',
+            f'Добро пожаловать в Cryptomarketplace, здесь '
+            f'Вы можете приобрести наиболее востребованные '
+            f'товары на рынке по конкурентным ценам, используя криптовалюту.'
+            f'Пожалуйста, заполните свой профиль для дальнейшего удобства оформления заказов',
 
         ]
     ), reply_markup=start_keyboard)

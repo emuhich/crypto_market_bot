@@ -37,10 +37,6 @@ class Category(models.Model):
         help_text='Ссылка на картинку категории',
         verbose_name='Картинка'
     )
-    description = models.TextField(
-        help_text='Описание категории',
-        verbose_name='Описание'
-    )
 
     def __str__(self):
         return self.title
@@ -70,10 +66,6 @@ class SubCategory(models.Model):
         related_name='sub_category',
         help_text='Категория к которой относится пост',
         verbose_name='Подкатегория'
-    )
-    description = models.TextField(
-        help_text='Описание подкатегории',
-        verbose_name='Описание'
     )
 
     def __str__(self):

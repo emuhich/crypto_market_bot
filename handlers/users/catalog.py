@@ -32,7 +32,6 @@ async def show_all_category(call: CallbackQuery, callback_data: dict, state: FSM
     await call.message.edit_text(text="\n".join(
         [
             f'🗂 {hbold(f"Каталог")}\n',
-            f'Здесь представлены все категории которые есть.',
             f'Выберете нужную категорию',
 
         ]
@@ -62,7 +61,6 @@ async def show_all_sub_category(call: CallbackQuery, callback_data: dict, state:
     await call.message.edit_text(text="\n".join(
         [
             f'{hbold(category.title)}\n',
-            category.description,
         ]
     ), reply_markup=category_keyboard(start=start, end=end, next=next, back=back, sub_categories=sub_categories, pk=pk))
 
@@ -90,7 +88,6 @@ async def show_all_sub_category(call: CallbackQuery, callback_data: dict, state:
     await call.message.edit_text(text="\n".join(
         [
             f'{hbold(sub_category.title)}\n',
-            sub_category.description,
         ]
     ), reply_markup=sub_category_keyboard(start=start, end=end, next=next, back=back, products=products, pk=pk))
 
@@ -119,7 +116,6 @@ async def show_all_sub_category(call: CallbackQuery, callback_data: dict, state:
     await call.message.answer(text="\n".join(
         [
             f'{hbold(sub_category.title)}\n',
-            sub_category.description,
         ]
     ), reply_markup=sub_category_keyboard(start=start, end=end, next=next, back=back, products=products, pk=pk))
 

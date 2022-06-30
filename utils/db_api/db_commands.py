@@ -117,13 +117,13 @@ def get_orders_by_user_id(telegram_id):
 
 
 @sync_to_async()
-def get_order(txId):
-    return BinanceOperationId(txId=txId).save()
+def get_order(pk_orders):
+    return Orders.objects.get(pk_orders=pk_orders)
 
 
 @sync_to_async()
 def create_payment_id(txId):
-    return BinanceOperationId.objects.filter(txId=txId).exists()
+    return BinanceOperationId(txId=txId).save()
 
 
 @sync_to_async()
