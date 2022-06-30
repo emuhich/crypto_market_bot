@@ -103,11 +103,11 @@ async def buy_product(call: CallbackQuery, callback_data: dict):
     string = [f'{hbold(f"Платежные данные {coin}")}']
     if coin == "BTC":
         amount = amount_btc
-        string.append(f'Сумма: {amount}\n')
+        string.append(f'Сумма: {hcode(amount)}\n')
         string.append(f'Адресс кошелька: \n{hcode("1MhT6depTHHwGjXKVhKDKfszP6a3rHMoeN")}\n')
     elif coin == "ETH":
         amount = amount_eth
-        string.append(f'Сумма: {amount}')
+        string.append(f'Сумма: {hcode(amount)}')
         string.append(f'Кошельки: \n')
         string.append(f'BEP20')
         string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
@@ -115,7 +115,7 @@ async def buy_product(call: CallbackQuery, callback_data: dict):
         string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
     else:
         amount = amount_usd
-        string.append(f'Сумма: {amount}')
+        string.append(f'Сумма: {hcode(amount)}')
         string.append(f'Кошельки: \n')
         string.append(f'BEP20')
         string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
