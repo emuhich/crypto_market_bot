@@ -1,18 +1,16 @@
 from decimal import Decimal
 
-from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 from aiogram.utils.markdown import hbold, hlink, hcode
 
 from data.config import SUPPORT_LINK
 from keyboards.inline.buy_products import back_to_product, check_payment, confirm_payment, payment_not_found, \
-    choice_payment
+    choice_payment, quantity_keyboard
 from keyboards.inline.callback_datas import buy_product_callback, check_payment_callback, choice_payment_callback
 from keyboards.inline.orders_keyboard import keyboard_my_orders
 from keyboards.inline.profile import my_profile_keyboard
 from loader import dp
-from states import States
 from utils.db_api.db_commands import get_product, select_client, create_order
 from utils.misc.binance import Binance
 
@@ -22,10 +20,15 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
     await call.message.delete()
     await state.finish()
     pk = int(callback_data.get("pk"))
+    number = int(callback_data.get("number"))
     quantity = int(callback_data.get("quantity"))
     pk_sub_categories = int(callback_data.get("pk_sub_categories"))
     user_id = call.message.chat.id
     user = await select_client(user_id)
+    if number > quantity:
+        number = 1
+    if number < 1:
+        number = quantity
     if not user.full_name or not user.address or not user.phone:
         await call.message.answer(
             text="\n".join(
@@ -42,90 +45,58 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
         return
     await call.message.answer(text="\n".join(
         [
-            f'{hbold(f"Введите количество товара")}\n',
-            f'⚠️ Внимание количество товара должно быть числом выше нуля и не больше'
-            f'товара в наличии - {quantity}',
+            f'{hbold(f"Выберете количество товара и нажмите продолжить")}\n',
 
         ]
-    ), reply_markup=back_to_product(pk, pk_sub_categories))
-    await States.QUANTITY_PRODUCTS.set()
-    await state.update_data(quantity=quantity)
-    await state.update_data(pk=pk)
-    await state.update_data(pk_sub_categories=pk_sub_categories)
+    ), reply_markup=quantity_keyboard(pk, pk_sub_categories, quantity, number))
 
 
-@dp.message_handler(state=States.QUANTITY_PRODUCTS)
-async def get_binance_address(message: types.Message, state: FSMContext):
-    await message.delete()
-    data = await state.get_data()
-    pk = data.get("pk")
-    pk_sub_categories = data.get("pk_sub_categories")
-    quantity = data.get("quantity")
-    if not message.text.isdigit():
-        await message.answer(text="\n".join(
-            [
-                f'{hbold(f"❌ Ошибка.")}\n',
-                f'⚠️ Внимание количество товара должно быть числом выше нуля и не больше'
-                f'товара в наличии - {quantity}\n',
-                f'Введите новое количество товара под этим сообщением',
-
-            ]
-        ), reply_markup=back_to_product(pk, pk_sub_categories))
-        return
-    elif int(message.text) <= 0 or int(message.text) > quantity:
-        await message.answer(text="\n".join(
-            [
-                f'{hbold(f"❌ Ошибка.")}\n',
-                f'⚠️ Внимание количество товара должно быть числом выше нуля и не больше'
-                f'товара в наличии - {quantity}\n',
-                f'Введите новое количество товара под этим сообщением',
-
-            ]
-        ), reply_markup=back_to_product(pk, pk_sub_categories))
-        return
-    count = int(message.text)
+@dp.callback_query_handler(buy_product_callback.filter(command_name="confirm_pay"))
+async def get_binance_address(call: CallbackQuery, callback_data: dict):
+    pk = int(callback_data.get("pk"))
+    number = int(callback_data.get("number"))
+    quantity = int(callback_data.get("quantity"))
+    pk_sub_categories = int(callback_data.get("pk_sub_categories"))
     product = await get_product(pk)
     try:
         client = Binance()
         commission = await client.get_rand_commission()
         commission_usd = await client.get_rand_commission_usdt()
-        amount_usd = (count * product.price) + commission_usd
-        amount_btc, amount_eth = await client.get_price_btc_eth(count * product.price)
+        amount_usd = (number * product.price) + commission_usd
+        amount_btc, amount_eth = await client.get_price_btc_eth(number * product.price)
         amount_btc += commission
         amount_eth += commission
     except Exception:
-        await message.answer(f"❌ Произошла ошибка при подключении к бинанс,"
-                             f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
-                             reply_markup=back_to_product(pk, pk_sub_categories))
+        await call.message.edit_text(f"❌ Произошла ошибка при подключении к бинанс,"
+                                     f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
+                                     reply_markup=back_to_product(pk, pk_sub_categories))
         return
-    await message.answer(
+    await call.message.edit_text(
         text="\n".join(
             [
                 f'{hbold(f"✅ Оплата.")}\n',
                 hbold("Заказ: "),
                 f'Название: {product.name}',
-                f'Количество: {count} шт\n',
+                f'Количество: {number} шт\n',
                 f'Сумма в BTC: {amount_btc}',
                 f'Сумма в ETH: {amount_eth}',
                 f'Сумма в USDT: {amount_usd}\n',
                 hbold('Выберете способ оплаты которым хотите оплатить')
 
             ]
-        ), reply_markup=choice_payment(pk_products=pk, pk_sub_categories=pk_sub_categories)
+        ), reply_markup=choice_payment(pk_products=pk, pk_sub_categories=pk_sub_categories, quantity=quantity,
+                                       number=number)
     )
-    await state.update_data(count=count)
 
 
-@dp.callback_query_handler(choice_payment_callback.filter(command_name="choice_payment"),
-                           state=States.QUANTITY_PRODUCTS)
-async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContext):
-    data = await state.get_data()
-    pk = data.get("pk")
-    pk_sub_categories = data.get("pk_sub_categories")
-    quantity = data.get("quantity")
-    count = data.get("count")
+@dp.callback_query_handler(choice_payment_callback.filter(command_name="choice_payment"))
+async def buy_product(call: CallbackQuery, callback_data: dict):
+    pk = int(callback_data.get("pk"))
+    number = int(callback_data.get("number"))
+    quantity = int(callback_data.get("quantity"))
+    pk_sub_categories = int(callback_data.get("pk_sub_categories"))
     coin = callback_data.get("coin")
-    if count > quantity:
+    if number > quantity:
         await call.message.edit_text(text="\n".join(
             [
                 f'{hbold(f"❌ Ошибка.")}\n',
@@ -134,14 +105,13 @@ async def buy_product(call: CallbackQuery, callback_data: dict, state: FSMContex
             ]
         ), reply_markup=back_to_product(pk, pk_sub_categories))
         return
-    await state.finish()
     product = await get_product(pk)
     try:
         client = Binance()
         commission = await client.get_rand_commission()
         commission_usd = await client.get_rand_commission_usdt()
-        amount_usd = (count * product.price) + commission_usd
-        amount_btc, amount_eth = await client.get_price_btc_eth(count * product.price)
+        amount_usd = (number * product.price) + commission_usd
+        amount_btc, amount_eth = await client.get_price_btc_eth(number * product.price)
         amount_btc += commission
         amount_eth += commission
     except Exception:

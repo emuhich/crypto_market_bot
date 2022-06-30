@@ -116,7 +116,8 @@ def product_keyboard(pk_sub_categories, pk_product, quantity):
                                       callback_data=buy_product_callback.new(command_name="buy_product",
                                                                              pk_sub_categories=pk_sub_categories,
                                                                              pk=pk_product,
-                                                                             quantity=quantity
+                                                                             quantity=quantity,
+                                                                             number=1
                                                                              ))
     back_button = InlineKeyboardButton(text="⬅️ Назад",
                                        callback_data=sub_category_callback.new(command_name="back_products",
