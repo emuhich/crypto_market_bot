@@ -17,6 +17,7 @@ from utils.misc.binance import Binance
 
 @dp.callback_query_handler(buy_product_callback.filter(command_name="confirm_pay"))
 async def get_binance_address(call: CallbackQuery, callback_data: dict):
+    await call.message.delete()
     pk = int(callback_data.get("pk"))
     number = int(callback_data.get("number"))
     quantity = int(callback_data.get("quantity"))
@@ -47,11 +48,11 @@ async def get_binance_address(call: CallbackQuery, callback_data: dict):
         amount_btc += commission
         amount_eth += commission
     except Exception:
-        await call.message.edit_text(f"❌ Произошла ошибка при подключении к бинанс,"
+        await call.message.answer(f"❌ Произошла ошибка при подключении к бинанс,"
                                      f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
                                      reply_markup=back_to_product(pk, pk_sub_categories))
         return
-    await call.message.edit_text(
+    await call.message.answer(
         text="\n".join(
             [
                 f'{hbold(f"✅ Оплата.")}\n',
