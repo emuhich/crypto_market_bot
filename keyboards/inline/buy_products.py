@@ -45,7 +45,8 @@ def choice_payment(pk_products, pk_sub_categories, quantity, number):
     back_button = InlineKeyboardButton(text="⬅️ Назад",
                                        callback_data=show_product_callback.new(command_name="show_product",
                                                                                pk_products=pk_products,
-                                                                               pk_sub_categories=pk_sub_categories
+                                                                               pk_sub_categories=pk_sub_categories,
+                                                                               number=1
                                                                                ))
     keyboard.insert(btc_button)
     keyboard.insert(eth_button)
