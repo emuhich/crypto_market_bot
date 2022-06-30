@@ -31,7 +31,7 @@ def quantity_keyboard(pk_products, pk_sub_categories, quantity, number):
                                                                               pk_sub_categories=pk_sub_categories,
                                                                               pk=pk_products,
                                                                               quantity=quantity,
-                                                                              number=number + 1
+                                                                              number=number
                                                                               ))
     back_button = InlineKeyboardButton(text="⬅️ Назад",
                                        callback_data=show_product_callback.new(command_name="show_product",
