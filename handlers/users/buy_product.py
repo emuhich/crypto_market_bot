@@ -125,10 +125,10 @@ async def buy_product(call: CallbackQuery, callback_data: dict):
         string.append(hcode("0x1eb153b1723166ebce846d10d61123396998d75c\n"))
         string.append(f'TRC20')
         string.append(hcode("TJe8ToeneKfQsFGfYnBy3nF2zfQwaZ5y4qR\n"))
-    string.append(hbold('⚠️ Важно при каждом платеже генерируется уникальная комиссия, она никак не '
-                        'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать'
+    string.append(hbold('⚠️ При каждом платеже генерируется уникальная комиссия, она никак не '
+                        'влияет на итоговую сумму, но помогает нам отследить платеж, поэтому сумма должна совпадать '
                         'до каждой цифры.\n'), )
-    string.append(f'После оплаты нажмите кнопку «Проверить платеж», деньги могут прийти не моментально.')
+    string.append(f'После оплаты нажмите кнопку «Проверить платеж», деньги придут в течение 2-3 минут.')
     await call.message.edit_text(text="\n".join(string),
                                  reply_markup=check_payment(pk_products=pk, pk_sub_categories=pk_sub_categories,
                                                             quantity=quantity, amount=amount, coin=coin,number=number))
