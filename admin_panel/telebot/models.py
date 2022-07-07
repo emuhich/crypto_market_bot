@@ -32,11 +32,6 @@ class Category(models.Model):
         help_text='Название новой категории',
         verbose_name='Название категории'
     )
-    image = models.CharField(
-        max_length=200,
-        help_text='Ссылка на картинку категории',
-        verbose_name='Картинка'
-    )
 
     def __str__(self):
         return self.title
@@ -52,11 +47,6 @@ class SubCategory(models.Model):
         max_length=200,
         help_text='Название новой подкатегории',
         verbose_name='Название подкатегории'
-    )
-    image = models.CharField(
-        max_length=200,
-        help_text='Ссылка на картинку подкатегории',
-        verbose_name='Картинка'
     )
     category = models.ForeignKey(
         Category,

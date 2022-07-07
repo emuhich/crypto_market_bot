@@ -17,9 +17,9 @@ async def show_menu_callback(call: CallbackQuery, state: FSMContext):
     await call.message.edit_text(text="\n".join(
         [
             f'{hbold(f"👨🏻‍💻 Поддержка")}\n',
-            f'Если у вас возникли какие то проблемы всегда можете обратится:\n',
-            f'Телефон: 79775678909'
-            f'Почта: exemple@mail.ru',
+            f'В случае возникновения вопросов, контакты:\n',
+            f'Телефон: +79999681343 (Савва)'
+            f'Почта: cryptomarketplace.msk@gmail.com',
         ]
     ), reply_markup=support_keyboard)
 
@@ -31,8 +31,8 @@ async def bot_help(message: types.Message, state: FSMContext):
     await message.answer(text="\n".join(
         [
             f'{hbold(f"👨🏻‍💻 Поддержка")}\n',
-            f'Если у вас возникли какие то проблемы всегда можете обратится:\n',
-            f'Телефон: 79775678909'
-            f'Почта: exemple@mail.ru',
+            f'В случае возникновения вопросов, контакты:\n',
+            f'Телефон: +79999681343 (Савва)'
+            f'Почта: cryptomarketplace.msk@gmail.com',
         ]
     ), reply_markup=support_keyboard)
