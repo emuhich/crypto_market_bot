@@ -38,7 +38,6 @@ class SubCategoryAdmin(admin.ModelAdmin):
         'pk',
         'title',
         'category',
-        'get_html_image',
     )
 
     list_display_links = ('pk', 'title')
@@ -47,11 +46,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     search_fields = ('title',)
 
-    def get_html_image(self, object):
-        if object.image:
-            return mark_safe(f"<img src='{object.image}' width=50>")
 
-    get_html_image.short_description = "Изображение"
 
     class Meta:
         verbose_name_plural = 'Под категории'
@@ -61,18 +56,13 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'title',
-        'get_html_image',
     )
 
     list_display_links = ('pk', 'title')
     empty_value_display = '-пусто-'
     search_fields = ('title',)
 
-    def get_html_image(self, object):
-        if object.image:
-            return mark_safe(f"<img src='{object.image}' width=50>")
 
-    get_html_image.short_description = "Изображение"
 
     class Meta:
         verbose_name_plural = 'Категории'
