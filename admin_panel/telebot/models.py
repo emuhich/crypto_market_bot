@@ -92,7 +92,7 @@ class Product(CreatedModel):
         verbose_name='Картинка'
     )
     cost_price = models.IntegerField(
-        help_text='Себестоимость продукта в USDT',
+        help_text='Себестоимость продукта в Рублях',
         verbose_name='Себестоимость',
         blank=True,
         null=True

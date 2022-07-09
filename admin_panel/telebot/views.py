@@ -1,6 +1,8 @@
 import datetime
 
 import requests
+import numpy
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.db.models import Sum
 from django.shortcuts import render
@@ -11,6 +13,7 @@ from admin_panel.telebot.models import Client, Orders, BOT_TOKEN
 
 
 def statistics(request):
+    avg_price = get_course()
     form = AddForm(request.POST or None)
     template = 'statistics/index.html'
     count_clients = Client.objects.all().count()
@@ -23,22 +26,25 @@ def statistics(request):
     count_orders_week = Orders.objects.filter(created__week=week).count()
     amount_orders_week = Orders.objects.filter(created__week=week).aggregate(Sum('price'))['price__sum']
     count_clients_week = Client.objects.filter(created__week=week).count()
-    cost_price_week = Orders.objects.filter(created__week=week).aggregate(Sum('cost_price'))['cost_price__sum']
+    cost_price_week = round(
+        (Orders.objects.filter(created__week=week).aggregate(Sum('cost_price'))['cost_price__sum'] / avg_price), 2)
 
     now = timezone.now()
     count_orders_today = Orders.objects.filter(created__date=now.date()).count()
     amount_orders_today = Orders.objects.filter(created__date=now.date()).aggregate(Sum('price'))['price__sum']
     count_clients_today = Client.objects.filter(created__date=now.date()).count()
-    cost_price_today = Orders.objects.filter(created__date=now.date()).aggregate(Sum('cost_price'))['cost_price__sum']
+    cost_price_today = round(
+        (Orders.objects.filter(created__date=now.date()).aggregate(Sum('cost_price'))['cost_price__sum'] / avg_price),
+        2)
 
     count_orders_months = Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).count()
     amount_orders_months = \
         Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('price'))[
             'price__sum']
     count_clients_months = Client.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).count()
-    cost_price_months = \
-        Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('cost_price'))[
-            'cost_price__sum']
+    cost_price_months = round((
+            Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('cost_price'))[
+                'cost_price__sum'] / avg_price), 2)
 
     if amount_orders_week is None:
         amount_orders_week = 0
@@ -94,3 +100,18 @@ def statistics(request):
         context.update({'is_mailing': is_mailing})
         context.update({'count_users': count_users})
         return render(request, template, context)
+
+
+def get_course():
+    response = requests.get('https://www.bestchange.ru/tether-trc20-to-qiwi.html')
+    soup = BeautifulSoup(response.text, 'lxml')
+    courses = soup.find('table', id="content_table").find('tbody').findAll('tr')
+    price_list = []
+    for i in courses[:5]:
+        str_price = i.findAll('td')[3].text
+        price: str = str_price.replace(' RUB QIWI', "").replace(' ', '')
+        if price:
+            price_list.append(float(price))
+
+    lst_avg = numpy.average(price_list)
+    return lst_avg
