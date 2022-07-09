@@ -26,25 +26,28 @@ def statistics(request):
     count_orders_week = Orders.objects.filter(created__week=week).count()
     amount_orders_week = Orders.objects.filter(created__week=week).aggregate(Sum('price'))['price__sum']
     count_clients_week = Client.objects.filter(created__week=week).count()
-    cost_price_week = round(
-        (Orders.objects.filter(created__week=week).aggregate(Sum('cost_price'))['cost_price__sum'] / avg_price), 2)
+    cost_price_week = Orders.objects.filter(created__week=week).aggregate(Sum('cost_price'))['cost_price__sum']
+    if cost_price_week:
+        cost_price_week = round((cost_price_week / avg_price), 2)
 
     now = timezone.now()
     count_orders_today = Orders.objects.filter(created__date=now.date()).count()
     amount_orders_today = Orders.objects.filter(created__date=now.date()).aggregate(Sum('price'))['price__sum']
     count_clients_today = Client.objects.filter(created__date=now.date()).count()
-    cost_price_today = round(
-        (Orders.objects.filter(created__date=now.date()).aggregate(Sum('cost_price'))['cost_price__sum'] / avg_price),
-        2)
+    cost_price_today = Orders.objects.filter(created__date=now.date()).aggregate(Sum('cost_price'))['cost_price__sum']
+    if cost_price_today:
+        cost_price_today = round((cost_price_today / avg_price), 2)
 
     count_orders_months = Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).count()
     amount_orders_months = \
         Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('price'))[
             'price__sum']
     count_clients_months = Client.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).count()
-    cost_price_months = round((
-            Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('cost_price'))[
-                'cost_price__sum'] / avg_price), 2)
+    cost_price_months = \
+        Orders.objects.filter(created__gt=timezone.now() - relativedelta(months=1)).aggregate(Sum('cost_price'))[
+            'cost_price__sum']
+    if cost_price_months:
+        cost_price_months = round((cost_price_months / avg_price), 2)
 
     if amount_orders_week is None:
         amount_orders_week = 0
