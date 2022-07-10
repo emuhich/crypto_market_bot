@@ -29,7 +29,6 @@ def statistics(request):
     cost_price_week = Orders.objects.filter(created__week=week).aggregate(Sum('cost_price'))['cost_price__sum']
     if cost_price_week:
         cost_price_week = round((cost_price_week / avg_price), 2)
-
     now = timezone.now()
     count_orders_today = Orders.objects.filter(created__date=now.date()).count()
     amount_orders_today = Orders.objects.filter(created__date=now.date()).aggregate(Sum('price'))['price__sum']

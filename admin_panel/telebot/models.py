@@ -57,6 +57,15 @@ class SubCategory(models.Model):
         help_text='Категория к которой относится пост',
         verbose_name='Подкатегория'
     )
+    ref_category = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='sub_ref',
+        help_text='Категория к которой относится пост',
+        verbose_name='Подкатегория'
+    )
 
     def __str__(self):
         return self.title
