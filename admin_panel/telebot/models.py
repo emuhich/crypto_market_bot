@@ -108,7 +108,7 @@ class Product(CreatedModel):
     )
     characteristics = models.JSONField(help_text='Характеристики продукта',
                                        verbose_name='Характеристики',
-                                       default={})
+                                       default=dict)
 
     class Meta:
         verbose_name = 'Продукты'
