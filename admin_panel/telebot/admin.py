@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
-
 from django.utils.safestring import mark_safe
 
 from .models import Product, SubCategory, Category, Client, Orders, Questions, TokenBinance
@@ -20,7 +18,9 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('created', 'sub_category',)
     empty_value_display = '-пусто-'
-    fields = ('name', 'description', 'sub_category', 'image', 'get_html_image', 'price', 'cost_price', 'quantity')
+    fields = (
+        'name', 'description', 'sub_category', 'image', 'get_html_image', 'price', 'cost_price', 'quantity',
+        'characteristics')
     readonly_fields = ('created', 'get_html_image')
 
     def get_html_image(self, object):
@@ -46,8 +46,6 @@ class SubCategoryAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     search_fields = ('title',)
 
-
-
     class Meta:
         verbose_name_plural = 'Под категории'
 
@@ -61,8 +59,6 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display_links = ('pk', 'title')
     empty_value_display = '-пусто-'
     search_fields = ('title',)
-
-
 
     class Meta:
         verbose_name_plural = 'Категории'

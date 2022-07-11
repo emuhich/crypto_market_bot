@@ -11,3 +11,4 @@ show_orders_callback = CallbackData("set", "command_name", "pk_orders")
 check_payment_callback = CallbackData("set", "command_name", "coin", "price", "pk", "quantity",
                                       "pk_sub_categories")
 choice_payment_callback = CallbackData("set", "command_name", "coin", "pk", "quantity", "pk_sub_categories", "number")
+characteristic_callback = CallbackData("set", "command", "pk", "start", "end", "keys", "value")

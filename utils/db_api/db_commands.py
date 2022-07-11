@@ -129,3 +129,8 @@ def create_payment_id(txId):
 @sync_to_async()
 def check_payment_id(txId):
     return BinanceOperationId.objects.filter(txId=txId).exists()
+
+
+@sync_to_async()
+def products_by_characteristic(pk, dict_characteristic):
+    return Product.objects.filter(sub_category=pk, characteristics__contains=dict_characteristic)

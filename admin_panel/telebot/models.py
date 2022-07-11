@@ -55,16 +55,7 @@ class SubCategory(models.Model):
         null=True,
         related_name='sub_category',
         help_text='Категория к которой относится пост',
-        verbose_name='Подкатегория'
-    )
-    ref_category = models.ForeignKey(
-        'self',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='sub_ref',
-        help_text='Категория к которой относится пост',
-        verbose_name='Подкатегория'
+        verbose_name='Категория'
     )
 
     def __str__(self):
@@ -101,7 +92,7 @@ class Product(CreatedModel):
         verbose_name='Картинка'
     )
     cost_price = models.IntegerField(
-        help_text='Себестоимость продукта в Рублях',
+        help_text='Себестоимость продукта в Руб.',
         verbose_name='Себестоимость',
         blank=True,
         null=True
@@ -110,11 +101,14 @@ class Product(CreatedModel):
         help_text='Цена продукта в USDT',
         verbose_name='Цена'
     )
-    quantity = models.IntegerField(
+    quantity = models.PositiveIntegerField(
         help_text='Количетсво продукта',
         verbose_name='Количество',
         default=0
     )
+    characteristics = models.JSONField(help_text='Характеристики продукта',
+                                       verbose_name='Характеристики',
+                                       default={})
 
     class Meta:
         verbose_name = 'Продукты'

@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from keyboards.inline.callback_datas import catalog_callback, sub_category_callback, show_product_callback, \
-    buy_product_callback
+    buy_product_callback, characteristic_callback
 
 
 def catalog_keyboard(start, end, next, back, categories):
@@ -72,7 +72,7 @@ def category_keyboard(start, end, next, back, sub_categories, pk):
     return keyboard
 
 
-def sub_category_keyboard(start, end, next, back, products, pk):
+def sub_category_keyboard(start, end, next, back, products, pk, keys, value):
     keyboard = InlineKeyboardMarkup(row_width=2)
     for product in products:
         question_button = InlineKeyboardButton(text=product.name,
@@ -101,11 +101,13 @@ def sub_category_keyboard(start, end, next, back, products, pk):
         keyboard.row(next_button)
     elif back and next is False:
         keyboard.row(back_button)
-    back_button = InlineKeyboardButton(text="⬅️ Назад", callback_data=sub_category_callback.new(
-        command_name="sub_category",
-        pk=pk,
+    back_button = InlineKeyboardButton(text="⬅️ Назад", callback_data=characteristic_callback.new(
+        command="back_char",
         start=0,
-        end=8
+        end=8,
+        keys=keys,
+        value=value,
+        pk=pk
     ))
     keyboard.row(back_button)
     return keyboard
@@ -118,7 +120,7 @@ def product_keyboard(pk_sub_categories, pk_product, quantity, number):
                                                                              pk_sub_categories=pk_sub_categories,
                                                                              pk=pk_product,
                                                                              quantity=quantity,
-                                                                             number=number
+                                                                             number=number,
                                                                              ))
     minus_quantity = InlineKeyboardButton(text="◀️",
                                           callback_data=show_product_callback.new(command_name="show_product",
@@ -177,4 +179,30 @@ def back_to_menu():
     keyboard = InlineKeyboardMarkup(row_width=1)
     back_button = InlineKeyboardButton(text="⬅️ Назад", callback_data="menu")
     keyboard.row(back_button)
+    return keyboard
+
+
+def characteristic_keyboard(list_characteristic, name_characteristic, pk):
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    for i in list_characteristic:
+        button = InlineKeyboardButton(text=i, callback_data=characteristic_callback.new(
+            command="about",
+            start=0,
+            end=8,
+            keys=name_characteristic,
+            value=i,
+            pk=pk
+        ))
+        keyboard.insert(button)
+
+    back_button = InlineKeyboardButton(text="⬅️ Назад", callback_data=characteristic_callback.new(
+        command="back_char",
+        start=0,
+        end=8,
+        keys=name_characteristic,
+        value=i,
+        pk=pk
+    ))
+    keyboard.insert(back_button)
+
     return keyboard
