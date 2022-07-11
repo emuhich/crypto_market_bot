@@ -223,7 +223,6 @@ async def show_products(call: CallbackQuery, callback_data: dict):
             f'{hbold("Описание:")}\n {product.description}\n',
             f'{hbold("Цена:")} {product.price} USDT.\n',
             f'{hbold("В наличии:")} {product.quantity} шт.',
-            f'{product.characteristics}',
 
         ]
     ), reply_markup=product_keyboard(pk_sub_categories, pk_products, product.quantity, number))

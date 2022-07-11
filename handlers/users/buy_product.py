@@ -50,7 +50,7 @@ async def get_binance_address(call: CallbackQuery, callback_data: dict):
     except Exception:
         await call.message.answer(f"❌ Произошла ошибка при подключении к бинанс,"
                                      f"Попробуйте позже или напишите в {hlink('техх пооддержку', SUPPORT_LINK)}",
-                                     reply_markup=back_to_product(pk, pk_sub_categories))
+                                     reply_markup=back_to_product(pk, pk_sub_categories), disable_web_page_preview=True)
         return
     await call.message.answer(
         text="\n".join(

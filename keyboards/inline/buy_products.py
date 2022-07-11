@@ -10,7 +10,8 @@ def back_to_product(pk_products, pk_sub_categories):
     back_button = InlineKeyboardButton(text="⬅️ Назад",
                                        callback_data=show_product_callback.new(command_name="show_product",
                                                                                pk_products=pk_products,
-                                                                               pk_sub_categories=pk_sub_categories
+                                                                               pk_sub_categories=pk_sub_categories,
+                                                                               number=1
                                                                                ))
     keyboard.insert(back_button)
     return keyboard
