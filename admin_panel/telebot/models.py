@@ -209,7 +209,7 @@ class Orders(CreatedModel):
         verbose_name='Сумма'
     )
     cost_price = models.IntegerField(
-        help_text='Себестоимость заказа в USDT',
+        help_text='Себестоимость продукта в Руб.',
         verbose_name='Себестоимость',
         blank=True,
         null=True
