@@ -33,7 +33,7 @@
             {% block nav_links_outer %}
             <li class="nav-header">{% block nav_heading %}Меню навигации{% endblock %}</li>
             <li class="nav-item">
-                    <a href="" class="nav-link">
+                    <a href="{% url 'panel:statistics' %}" class="nav-link">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Статистика</p>
                     </a>
